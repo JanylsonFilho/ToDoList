@@ -1,0 +1,111 @@
+const taskService = require("../services/taskService")
+
+class TaskController {
+ 
+  async getTasks(req, res, next) {
+    try {
+      const result = await taskService.getTasks(req.query)
+      res.json(result)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * Obter tarefa por ID
+   */
+  async getTaskById(req, res, next) {
+    try {
+      const result = await taskService.getTaskById(req.params.id)
+      res.json(result)
+    } catch (error) {
+      if (error.message.includes("não encontrada")) {
+        return res.status(404).json({
+          success: false,
+          message: error.message,
+        })
+      }
+      next(error)
+    }
+  }
+
+  /**
+   * Criar nova tarefa
+   */
+  async createTask(req, res, next) {
+    try {
+      const result = await taskService.createTask(req.body, req.file)
+      res.status(201).json(result)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * Atualizar tarefa
+   */
+  async updateTask(req, res, next) {
+    try {
+      const result = await taskService.updateTask(req.params.id, req.body, req.file)
+      res.json(result)
+    } catch (error) {
+      if (error.message.includes("não encontrada")) {
+        return res.status(404).json({
+          success: false,
+          message: error.message,
+        })
+      }
+      next(error)
+    }
+  }
+
+  /**
+   * Excluir tarefa
+   */
+  async deleteTask(req, res, next) {
+    try {
+      const result = await taskService.deleteTask(req.params.id)
+      res.json(result)
+    } catch (error) {
+      if (error.message.includes("não encontrada")) {
+        return res.status(404).json({
+          success: false,
+          message: error.message,
+        })
+      }
+      next(error)
+    }
+  }
+
+  /**
+   * Alternar status de conclusão
+   */
+  async toggleComplete(req, res, next) {
+    try {
+      const result = await taskService.toggleTaskComplete(req.params.id)
+      res.json(result)
+    } catch (error) {
+      if (error.message.includes("não encontrada")) {
+        return res.status(404).json({
+          success: false,
+          message: error.message,
+        })
+      }
+      next(error)
+    }
+  }
+
+  /**
+   * Obter estatísticas das tarefas
+   */
+  async getStatistics(req, res, next) {
+    try {
+      const result = await taskService.getTasksStatistics()
+      res.json(result)
+    } catch (error) {
+      next(error)
+    }
+  }
+}
+
+module.exports = new TaskController()

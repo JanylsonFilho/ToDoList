@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Tarefas - To-Do App</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-tasks"></i> Minha Lista de Tarefas</h1>
+            <p>Organize suas atividades de forma simples e eficiente</p>
+        </header>
+
+        <section class="statistics-section">
+            <div class="statistics-container">
+                <h2><i class="fas fa-chart-bar"></i> Dashboard</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card total">
+                        <div class="stat-icon">
+                            <i class="fas fa-list"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-tasks">0</h3>
+                            <p>Total de Tarefas</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card active">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="active-tasks">0</h3>
+                            <p>Tarefas Ativas</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card completed">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="completed-tasks">0</h3>
+                            <p>Concluídas</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card overdue">
+                        <div class="stat-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="overdue-tasks">0</h3>
+                            <p>Vencidas</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress-section">
+                    <div class="progress-card">
+                        <div class="progress-header">
+                            <h4><i class="fas fa-trophy"></i> Taxa de Conclusão</h4>
+                            <span id="completion-percentage">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div id="progress-fill" class="progress-fill"></div>
+                        </div>
+                        <p class="progress-text">Continue assim! Você está indo muito bem! 🎉</p>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="quick-action-btn" onclick="if(window.todoApp) window.todoApp.showActiveTasksOnly()">
+                        <i class="fas fa-eye"></i> Ver Ativas
+                    </button>
+                    <button class="quick-action-btn" onclick="if(window.todoApp) window.todoApp.showOverdueTasks()">
+                        <i class="fas fa-exclamation-circle"></i> Ver Vencidas
+                    </button>
+                    <button class="quick-action-btn" onclick="if(window.todoApp) window.todoApp.refreshStatistics()">
+                        <i class="fas fa-sync-alt"></i> Atualizar
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="task-form-section">
+            <div class="form-container">
+                <h2 id="form-title">
+                    <i class="fas fa-plus-circle"></i> Nova Tarefa
+                </h2>
+                
+                <form id="task-form" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="title">
+                            <i class="fas fa-heading"></i> Título *
+                        </label>
+                        <input type="text" id="title" name="title" required maxlength="100" 
+                               placeholder="Digite o título da tarefa">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">
+                            <i class="fas fa-align-left"></i> Descrição
+                        </label>
+                        <textarea id="description" name="description" maxlength="500" 
+                                  placeholder="Descreva sua tarefa (opcional)"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="priority">
+                                <i class="fas fa-exclamation-triangle"></i> Prioridade
+                            </label>
+                            <select id="priority" name="priority">
+                                <option value="baixa">Baixa</option>
+                                <option value="média" selected>Média</option>
+                                <option value="alta">Alta</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dueDate">
+                                <i class="fas fa-calendar-alt"></i> Data Limite
+                            </label>
+                            <input type="date" id="dueDate" name="dueDate">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="attachment">
+                            <i class="fas fa-paperclip"></i> Anexo
+                        </label>
+                        <input type="file" id="attachment" name="attachment" 
+                               accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.txt">
+                        <small>Tipos permitidos: JPG, PNG, GIF, PDF, DOC, DOCX, TXT (máx. 5MB)</small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" id="submit-btn">
+                            <i class="fas fa-save"></i> Salvar Tarefa
+                        </button>
+                        <button type="button" id="cancel-btn" style="display: none;">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <section class="controls-section">
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">
+                    <i class="fas fa-list"></i> Todas
+                </button>
+                <button class="filter-btn" data-filter="active">
+                    <i class="fas fa-clock"></i> Ativas
+                </button>
+                <button class="filter-btn" data-filter="completed">
+                    <i class="fas fa-check-circle"></i> Concluídas
+                </button>
+            </div>
+
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Buscar tarefas...">
+                <i class="fas fa-search"></i>
+            </div>
+        </section>
+
+        <section class="pagination-controls">
+            <div class="pagination-info">
+                <span id="pagination-info">Carregando...</span>
+            </div>
+            <div class="items-per-page">
+                <label for="items-per-page-select">Itens por página:</label>
+                <select id="items-per-page-select">
+                    <option value="5" selected>5</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="tasks-section">
+            <div class="tasks-header">
+                <h2><i class="fas fa-list-ul"></i> Suas Tarefas</h2>
+                <div class="tasks-count">
+                    <span id="tasks-counter">0 tarefas</span>
+                </div>
+            </div>
+
+            <div id="loading" class="loading">
+                <i class="fas fa-spinner fa-spin"></i> Carregando...
+            </div>
+
+            <div id="tasks-container" class="tasks-container">
+            </div>
+
+            <div id="no-tasks" class="no-tasks" style="display: none;">
+                <i class="fas fa-inbox"></i>
+                <h3>Nenhuma tarefa encontrada</h3>
+                <p>Que tal criar sua primeira tarefa?</p>
+            </div>
+        </section>
+
+        <section class="pagination-section">
+            <div id="pagination" class="pagination">
+            </div>
+        </section>
+    </div>
+
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content">
+            <h3><i class="fas fa-exclamation-triangle"></i> Confirmar Ação</h3>
+            <p id="confirm-message">Tem certeza que deseja realizar esta ação?</p>
+            <div class="modal-actions">
+                <button id="confirm-yes" class="btn-danger">
+                    <i class="fas fa-check"></i> Sim
+                </button>
+                <button id="confirm-no" class="btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+ 
+    <script src="js/utils/domHelpers.js"></script>
+    <script src="js/utils/toast.js"></script>
+    <script src="js/utils/modal.js"></script>
+    <script src="js/utils/loading.js"></script>
+    
+    <script src="js/services/taskService.js"></script>
+    
+    <script src="js/components/statisticsDashboard.js"></script>
+    <script src="js/components/pagination.js"></script>
+    <script src="js/components/taskForm.js"></script>
+    <script src="js/components/taskList.js"></script>
+    <script src="js/components/filters.js"></script>
+    
+    <script src="js/app.js"></script>
+</body>
+</html>
