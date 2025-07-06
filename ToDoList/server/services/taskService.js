@@ -1,3 +1,5 @@
+
+
 const taskDAO = require("../dao/taskDAO")
 const fs = require("fs").promises
 const path = require("path")
@@ -110,12 +112,24 @@ class TaskService {
         title: taskData.title.trim(),
         description: taskData.description?.trim() || "",
         priority: taskData.priority || "média",
-        dueDate: taskData.dueDate ? new Date(taskData.dueDate) : null,
         completed: false,
       }
 
-      if (newTaskData.dueDate && newTaskData.dueDate < new Date()) {
-        throw new Error("Data de vencimento não pode ser no passado")
+      if (taskData.dueDate) {
+        // Parse the date components to create a date in local time
+        const [year, month, day] = taskData.dueDate.split('-').map(Number);
+        const dueDate = new Date(year, month - 1, day); // Month is 0-indexed
+        
+        // Set 'today' to the beginning of the current day in local time for comparison
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (dueDate < today) {
+          throw new Error("Data de vencimento não pode ser no passado")
+        }
+        newTaskData.dueDate = dueDate;
+      } else {
+        newTaskData.dueDate = null;
       }
 
       if (file) {
@@ -175,12 +189,22 @@ class TaskService {
         updateData.completed = taskData.completed === "true" || taskData.completed === true
 
       if (taskData.dueDate) {
-        const dueDate = new Date(taskData.dueDate)
-        if (dueDate < new Date()) {
+        // Parse the date components to create a date in local time
+        const [year, month, day] = taskData.dueDate.split('-').map(Number);
+        const dueDate = new Date(year, month - 1, day); // Month is 0-indexed
+
+        // Set 'today' to the beginning of the current day in local time for comparison
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (dueDate < today) {
           throw new Error("Data de vencimento não pode ser no passado")
         }
-        updateData.dueDate = dueDate
+        updateData.dueDate = dueDate;
+      } else if (taskData.dueDate === "") { // Handle clearing the due date
+        updateData.dueDate = null;
       }
+
 
       if (file) {
         await this._validateFile(file)

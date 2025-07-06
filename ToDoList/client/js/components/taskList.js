@@ -1,4 +1,3 @@
-
 class TaskList {
   constructor() {
     this.container = document.getElementById("tasks-container")
@@ -45,9 +44,15 @@ class TaskList {
    * Criar HTML de uma tarefa
    */
   createTaskHTML(task) {
-    const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString("pt-BR") : null
+    const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString("pt-BR", { timeZone: 'UTC' }) : null;
     const createdDate = new Date(task.createdAt).toLocaleDateString("pt-BR")
-    const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && !task.completed
+
+    const taskDueDate = task.dueDate ? new Date(task.dueDate) : null;
+    const nowUtcMidnight = new Date();
+    nowUtcMidnight.setUTCHours(0, 0, 0, 0); // Current day at UTC midnight
+
+    const isOverdue = taskDueDate && taskDueDate.setUTCHours(0, 0, 0, 0) < nowUtcMidnight.getTime() && !task.completed;
+
 
     return `
       <div class="task-item ${task.completed ? "completed" : ""} ${isOverdue ? "overdue" : ""}" 
